@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import jwt, {   } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import { UserRole } from "../generated/prisma/enums";
- 
 
 type DecodedToken = {
   userId: string;
@@ -33,15 +32,7 @@ const authGurd = (req: Request, res: Response, next: NextFunction) => {
     };
 
     next();
-  } catch (error:any) {
-     if (error.name === "TokenExpiredError") {
-      return res.status(401).json({
-        success: false,
-        message: "Token expired",
-        code: "TOKEN_EXPIRED",
-      });
-    }
-
+  } catch (error: any) {
     return res.status(401).json({
       success: false,
       message: "Invalid token",
@@ -50,7 +41,6 @@ const authGurd = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export default authGurd;
-
 
 export const authorize =
   (...allowedRoles: UserRole[]) =>
