@@ -44,11 +44,26 @@ enum CategoryStatus {
 }
 
 model Category {
-  id          String   @id @default(uuid())
+  id          String         @id @default(uuid())
   title       String
   description String?
   thumbnail   String?
-  status CategoryStatus @default(ACTIVE)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      CategoryStatus @default(ACTIVE)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  products    Product[]
+}
+
+model Product {
+  id String @id @default(uuid())
+  name        String
+  description String
+  price         Float
+  stock Int
+  isFeatured  Boolean @default(false)
+  categoryId String
+  category Category @relation(fields: [categoryId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
