@@ -1,17 +1,14 @@
 import { Request, Response } from "express";
 import { prisma } from "../../lib/prisma";
 import catchAsync from "../../utils/catchAsync";
+import categoryService from "./category.service";
+import AppError from "../../errors/AppError";
 
 // create category controller
 const createCategory = catchAsync(async (req: Request, res: Response) => {
-  const { title, description, thumbnail } = req.body;
-  const category = await prisma.category.create({
-    data: {
-      title,
-      description,
-      thumbnail,
-    },
-  });
+ 
+  const category = await categoryService.createCategoryIntoDB(req.body) 
+
   res.status(201).json({
     success: true,
     message: "Category created successfully",
@@ -21,7 +18,7 @@ const createCategory = catchAsync(async (req: Request, res: Response) => {
 
 // get all category controller
 const getAllCategory = catchAsync(async (req: Request, res: Response) => {
-  const category = await prisma.category.findMany();
+  const category = await categoryService.getCategoryFromBD()
   res.status(201).json({
     success: true,
     data: category,
@@ -30,26 +27,7 @@ const getAllCategory = catchAsync(async (req: Request, res: Response) => {
 
 // update category controller
 const categoryUpdateById = catchAsync(async (req: Request, res: Response) => {
-  const category = await prisma.category.findUnique({
-    where: {
-      id: req.params.id as string,
-    },
-  });
-
-  if (!category) {
-    throw new Error("Category not found!");
-  }
-
-  const update = await prisma.category.update({
-    where: {
-      id: req.params.id as string,
-    },
-    data: {
-      title: req.body.title,
-      description: req.body.description,
-    },
-  });
-
+  const update =  await categoryService.updateCategoryFromDB(req.params.id as string)
   res.status(201).json({
     success: true,
     data: update,
@@ -68,11 +46,7 @@ const categoryDeleteById = catchAsync(async (req: Request, res: Response) => {
     throw new Error("Category not found!");
   }
 
-  await prisma.category.delete({
-    where: {
-      id: req.params.id as string,
-    },
-  });
+  await categoryService.deleteCategory(req.params.id as string)
 
   res.status(201).json({
     success: true,

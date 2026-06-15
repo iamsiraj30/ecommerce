@@ -4,29 +4,26 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import catchAsync from "../../utils/catchAsync";
 import AppError from "../../errors/AppError";
+import authService from "./auth.service";
+
+// create new user 
 const createUser = catchAsync(async (req: Request, res: Response) => {
   const {
     name,
     email,
-    password,
-    profileImg,
-    phone,
-    address,
-    age,
-    status,
-    isVerified,
+    password
   } = req.body;
 
   if (!name) {
-    throw new Error("Name is required");
+    throw new AppError(401,"Name is required");
   }
 
   if (!email) {
-    throw new Error("Email is required");
+    throw new AppError(401,"Email is required");
   }
 
   if (!password) {
-    throw new Error("Password is required");
+    throw new AppError(400,"Password is required");
   }
 
   const existUser = await prisma.user.findUnique({
@@ -34,35 +31,13 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
   });
 
   if (existUser) {
-    throw new Error("User already exists");
+    throw new AppError(401,"User already exists");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await prisma.user.create({
-    data: {
-      name,
-      email,
-      password: hashedPassword,
-      profileImg,
-      phone,
-      address,
-      age,
-      status,
-      isVerified,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profileImg: true,
-      phone: true,
-      address: true,
-      age: true,
-      role: true,
-      status: true,
-    },
-  });
+  const user = await authService.createUserIntoDB(req.body,hashedPassword)
+
 
   res.status(201).json({
     success: true,
@@ -71,6 +46,8 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+// login user
 const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
