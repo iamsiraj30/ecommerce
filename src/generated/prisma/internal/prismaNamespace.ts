@@ -1338,6 +1338,7 @@ export type WishlistScalarFieldEnum = (typeof WishlistScalarFieldEnum)[keyof typ
 export const ShippingAddressScalarFieldEnum = {
   id: 'id',
   fullName: 'fullName',
+  userId: 'userId',
   phone: 'phone',
   addressLine1: 'addressLine1',
   addressLine2: 'addressLine2',

@@ -13,6 +13,7 @@ import globalErrorHandler from "./middleware/globalErrorHandler";
 import productRouter from "./modules/product/product.route";
 import wishlistRouter from "./modules/wishlist/wishlist.route";
 import cartRouter from "./modules/cart/cart.route";
+import { swaggerJsonHandler, swaggerUiHandler } from "./swagger";
 
 const app: Application = express();
 
@@ -33,6 +34,9 @@ app.use("/api/v1/cart", cartRouter);
 app.get("/api/v1", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
+
+app.get("/api/v1/docs.json", swaggerJsonHandler);
+app.get("/api/v1/docs", swaggerUiHandler);
 
 // global error handler
 app.use(globalErrorHandler);

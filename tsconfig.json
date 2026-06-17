@@ -1,20 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2023",
-    "module": "ESNext",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "rootDir": "./src",
     "outDir": "./dist",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true,
-
-    "moduleResolution": "bundler",
-
-    "ignoreDeprecations": "6.0",
-    "typeRoots": ["./node_modules/@types", "./src/types"]
-
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules","dist","generated/prisma"]
+  "exclude": ["node_modules", "dist", "generated/prisma"]
 }
