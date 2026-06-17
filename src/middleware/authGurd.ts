@@ -14,7 +14,7 @@ const authGurd = (req: Request, res: Response, next: NextFunction) => {
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: "Unauthorized",
+      message: "You don't have permission",
     });
   }
 
@@ -24,7 +24,6 @@ const authGurd = (req: Request, res: Response, next: NextFunction) => {
       process.env.JWT_ACCESS_SECRET as string,
     ) as DecodedToken;
 
-    console.log(decoded);
     req.user = {
       userId: decoded.userId,
       email: decoded.email,
@@ -46,7 +45,7 @@ export const authorize =
   (...allowedRoles: UserRole[]) =>
   (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "You are not authorized" });
     }
 
     if (!allowedRoles.includes(req.user.role as UserRole)) {

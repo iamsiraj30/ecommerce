@@ -10,6 +10,7 @@ import AppError from "../../errors/AppError";
 const getFileUrl = (file: Express.Multer.File) => `/uploads/${file.filename}`;
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
+  const { name, price, categoryId } = req.body;
   const files = req.files as {
     thumbnail?: Express.Multer.File[];
     productImages?: Express.Multer.File[];
@@ -17,6 +18,15 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
   const thumbnail = files?.thumbnail?.[0];
   const productImages = files?.productImages || [];
 
+  if (!categoryId) {
+    throw new AppError(401, "Category id is required");
+  }
+  if (!price) {
+    throw new AppError(401, "Price is required");
+  }
+  if (!name) {
+    throw new AppError(401, "Title is required");
+  }
   if (!thumbnail) {
     throw new AppError(401, "Product thumbnail is required");
   }
@@ -53,7 +63,12 @@ const getallProduct = catchAsync(async (req: Request, res: Response) => {
           title: true,
         },
       },
-      productImages: true,
+      productImages: {
+        select: {
+          id: true,
+          image: true,
+        },
+      },
     },
   });
 
