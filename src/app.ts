@@ -1,11 +1,4 @@
-import express, {
-  Application,
-  NextFunction,
-  Request,
-  Response,
-  ErrorRequestHandler,
-  urlencoded,
-} from "express";
+import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import authRouter from "./modules/auth/auth.route";
 import categoryRouter from "./modules/category/category.route";
