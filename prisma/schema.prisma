@@ -33,22 +33,23 @@ enum PaymentStatus {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  name       String
-  email      String     @unique
-  password   String
-  profileImg String?
-  phone      String?
-  address    String?
-  age        Int?
-  role       UserRole   @default(USER)
-  status     UserStatus @default(ACTIVE)
-  isVerified Boolean    @default(false)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  wishlists  Wishlist[]
-  orders     Order[]
-  cart       Cart?
+  id                String            @id @default(uuid())
+  name              String
+  email             String            @unique
+  password          String
+  profileImg        String?
+  phone             String?
+  address           String?
+  age               Int?
+  role              UserRole          @default(USER)
+  status            UserStatus        @default(ACTIVE)
+  isVerified        Boolean           @default(false)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  wishlists         Wishlist[]
+  orders            Order[]
+  cart              Cart?
+  shippingAddresses ShippingAddress[]
 }
 
 enum CategoryStatus {
@@ -71,7 +72,7 @@ model Product {
   id            String         @id @default(uuid())
   name          String
   description   String
-  price         Float
+  price         Float          @default(0)
   stock         Int
   isFeatured    Boolean        @default(false)
   thumbnail     String
@@ -107,6 +108,8 @@ model Wishlist {
 model ShippingAddress {
   id           String   @id @default(uuid())
   fullName     String
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
   phone        String
   addressLine1 String
   addressLine2 String?
@@ -123,7 +126,6 @@ model Order {
   orderNumber       String          @unique
   userId            String
   shippingAddressId String
-  couponId          String?
   subtotal          Float
   discountAmount    Float           @default(0)
   totalAmount       Float

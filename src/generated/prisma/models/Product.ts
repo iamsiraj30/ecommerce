@@ -344,7 +344,7 @@ export type ProductCreateInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -361,7 +361,7 @@ export type ProductUncheckedCreateInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -412,7 +412,7 @@ export type ProductCreateManyInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -635,7 +635,7 @@ export type ProductCreateWithoutCategoryInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -651,7 +651,7 @@ export type ProductUncheckedCreateWithoutCategoryInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -709,7 +709,7 @@ export type ProductCreateWithoutProductImagesInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -725,7 +725,7 @@ export type ProductUncheckedCreateWithoutProductImagesInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -789,7 +789,7 @@ export type ProductCreateWithoutWishlistsInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -805,7 +805,7 @@ export type ProductUncheckedCreateWithoutWishlistsInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -869,7 +869,7 @@ export type ProductCreateWithoutOrderItemsInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -885,7 +885,7 @@ export type ProductUncheckedCreateWithoutOrderItemsInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -949,7 +949,7 @@ export type ProductCreateWithoutCartItemsInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -965,7 +965,7 @@ export type ProductUncheckedCreateWithoutCartItemsInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string
@@ -1029,7 +1029,7 @@ export type ProductCreateManyCategoryInput = {
   id?: string
   name: string
   description: string
-  price: number
+  price?: number
   stock: number
   isFeatured?: boolean
   thumbnail: string

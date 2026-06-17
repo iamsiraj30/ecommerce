@@ -11,6 +11,7 @@ const getFileUrl = (file: Express.Multer.File) => `/uploads/${file.filename}`;
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
   const { name, price, categoryId } = req.body;
+
   const files = req.files as {
     thumbnail?: Express.Multer.File[];
     productImages?: Express.Multer.File[];
@@ -21,6 +22,17 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
   if (!categoryId) {
     throw new AppError(401, "Category id is required");
   }
+
+  const category = await prisma.category.findUnique({
+    where: {
+      id: categoryId,
+    },
+  });
+
+  if (!category) {
+    throw new AppError(404, "Category not found");
+  }
+
   if (!price) {
     throw new AppError(401, "Price is required");
   }

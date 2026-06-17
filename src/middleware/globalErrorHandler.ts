@@ -9,9 +9,8 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     statusCode = error.statusCode;
     message = error.message;
   }
-  
 
-    // JWT Expired
+  // JWT Expired
   if (error instanceof jwt.TokenExpiredError) {
     statusCode = 401;
     message = "Token expired";
@@ -23,10 +22,10 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     message = "Invalid token";
   }
 
-
   res.status(statusCode).json({
     success: false,
     message,
+    error,
   });
 };
 
