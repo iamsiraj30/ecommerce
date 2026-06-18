@@ -6,6 +6,9 @@ import globalErrorHandler from "./middleware/globalErrorHandler";
 import productRouter from "./modules/product/product.route";
 import wishlistRouter from "./modules/wishlist/wishlist.route";
 import cartRouter from "./modules/cart/cart.route";
+import shippingAddressRouter from "./modules/shipping-address/shipping-address.route";
+import orderRouter from "./modules/order/order.route";
+import paymentRouter from "./modules/payment/payment.route";
 import { swaggerJsonHandler, swaggerUiHandler } from "./swagger";
 
 const app: Application = express();
@@ -23,6 +26,9 @@ app.use("/api/v1/category", categoryRouter);
 app.use("/api/v1/product", productRouter);
 app.use("/api/v1/wishlist", wishlistRouter);
 app.use("/api/v1/cart", cartRouter);
+app.use("/api/v1/shipping-address", shippingAddressRouter);
+app.use("/api/v1/order", orderRouter);
+app.use("/api/v1/payment", paymentRouter);
 
 app.get("/api/v1", (req: Request, res: Response) => {
   res.send("Hello World!");

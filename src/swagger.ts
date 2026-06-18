@@ -5,8 +5,7 @@ export const swaggerSpec = {
   info: {
     title: "Ecommerce Backend API",
     version: "1.0.0",
-    description:
-      "Swagger documentation for the ecommerce backend API routes.",
+    description: "Swagger documentation for the ecommerce backend API routes.",
   },
   servers: [
     {
@@ -21,6 +20,9 @@ export const swaggerSpec = {
     { name: "Product", description: "Product management" },
     { name: "Wishlist", description: "Wishlist management" },
     { name: "Cart", description: "Cart management" },
+    { name: "Shipping Address", description: "Shipping address management" },
+    { name: "Order", description: "Order management & checkout" },
+    { name: "Payment", description: "Payment management" },
   ],
   components: {
     securitySchemes: {
@@ -79,8 +81,16 @@ export const swaggerSpec = {
         required: ["name", "email", "password"],
         properties: {
           name: { type: "string", example: "John Doe" },
-          email: { type: "string", format: "email", example: "john@example.com" },
-          password: { type: "string", format: "password", example: "secret123" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "john@example.com",
+          },
+          password: {
+            type: "string",
+            format: "password",
+            example: "secret123",
+          },
           phone: { type: "string", example: "+8801700000000" },
           address: { type: "string", example: "Dhaka, Bangladesh" },
           age: { type: "integer", example: 25 },
@@ -91,8 +101,16 @@ export const swaggerSpec = {
         type: "object",
         required: ["email", "password"],
         properties: {
-          email: { type: "string", format: "email", example: "john@example.com" },
-          password: { type: "string", format: "password", example: "secret123" },
+          email: {
+            type: "string",
+            format: "email",
+            example: "john@example.com",
+          },
+          password: {
+            type: "string",
+            format: "password",
+            example: "secret123",
+          },
         },
       },
       LoginResponseData: {
@@ -215,6 +233,209 @@ export const swaggerSpec = {
           action: { type: "string", enum: ["increase", "decrease"] },
         },
       },
+      ShippingAddress: {
+        type: "object",
+        properties: {
+          id: { type: "string", format: "uuid" },
+          fullName: { type: "string", example: "John Doe" },
+          userId: { type: "string", format: "uuid" },
+          phone: { type: "string", example: "+8801700000000" },
+          addressLine1: { type: "string", example: "123 Main Street" },
+          addressLine2: { type: "string", nullable: true, example: "Apt 4B" },
+          city: { type: "string", example: "Dhaka" },
+          state: { type: "string", nullable: true, example: "Dhaka Division" },
+          country: { type: "string", example: "Bangladesh" },
+          postalCode: { type: "string", example: "1205" },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+      CreateShippingAddressRequest: {
+        type: "object",
+        required: ["fullName", "phone", "addressLine1", "city", "country", "postalCode"],
+        properties: {
+          fullName: { type: "string", example: "John Doe" },
+          phone: { type: "string", example: "+8801700000000" },
+          addressLine1: { type: "string", example: "123 Main Street" },
+          addressLine2: { type: "string", example: "Apt 4B" },
+          city: { type: "string", example: "Dhaka" },
+          state: { type: "string", example: "Dhaka Division" },
+          country: { type: "string", example: "Bangladesh" },
+          postalCode: { type: "string", example: "1205" },
+        },
+      },
+      UpdateShippingAddressRequest: {
+        type: "object",
+        properties: {
+          fullName: { type: "string", example: "John Doe" },
+          phone: { type: "string", example: "+8801700000000" },
+          addressLine1: { type: "string", example: "123 Main Street" },
+          addressLine2: { type: "string", example: "Apt 4B" },
+          city: { type: "string", example: "Dhaka" },
+          state: { type: "string", example: "Dhaka Division" },
+          country: { type: "string", example: "Bangladesh" },
+          postalCode: { type: "string", example: "1205" },
+        },
+      },
+      OrderItemProduct: {
+        type: "object",
+        properties: {
+          id: { type: "string", format: "uuid" },
+          name: { type: "string", example: "Smartphone" },
+          thumbnail: { type: "string", example: "/uploads/thumbnail.png" },
+          price: { type: "number", example: 499.99 },
+        },
+      },
+      OrderItem: {
+        type: "object",
+        properties: {
+          id: { type: "string", format: "uuid" },
+          orderId: { type: "string", format: "uuid" },
+          productId: { type: "string", format: "uuid" },
+          quantity: { type: "integer", example: 2 },
+          unitPrice: { type: "number", example: 499.99 },
+          totalPrice: { type: "number", example: 999.98 },
+          product: { $ref: "#/components/schemas/OrderItemProduct" },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+      PaymentSummary: {
+        type: "object",
+        properties: {
+          id: { type: "string", format: "uuid" },
+          amount: { type: "number", example: 999.98 },
+          provider: { type: "string", example: "COD" },
+          method: { type: "string", nullable: true, example: null },
+          status: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+          transactionId: { type: "string", nullable: true },
+          paidAt: { type: "string", format: "date-time", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+        },
+      },
+      Order: {
+        type: "object",
+        properties: {
+          id: { type: "string", format: "uuid" },
+          orderNumber: { type: "string", example: "ORD-M1A2B3-X4Y5" },
+          userId: { type: "string", format: "uuid" },
+          shippingAddressId: { type: "string", format: "uuid" },
+          subtotal: { type: "number", example: 999.98 },
+          discountAmount: { type: "number", example: 0 },
+          totalAmount: { type: "number", example: 999.98 },
+          paymentStatus: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+          orderStatus: { type: "string", enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] },
+          items: {
+            type: "array",
+            items: { $ref: "#/components/schemas/OrderItem" },
+          },
+          shippingAddress: { $ref: "#/components/schemas/ShippingAddress" },
+          payments: {
+            type: "array",
+            items: { $ref: "#/components/schemas/PaymentSummary" },
+          },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+        },
+      },
+      AdminOrder: {
+        type: "object",
+        description: "Order with user info (admin view)",
+        allOf: [
+          { $ref: "#/components/schemas/Order" },
+          {
+            type: "object",
+            properties: {
+              user: {
+                type: "object",
+                properties: {
+                  id: { type: "string", format: "uuid" },
+                  name: { type: "string", example: "John Doe" },
+                  email: { type: "string", example: "john@example.com" },
+                  phone: { type: "string", nullable: true },
+                },
+              },
+            },
+          },
+        ],
+      },
+      CheckoutRequest: {
+        type: "object",
+        required: ["shippingAddressId"],
+        properties: {
+          shippingAddressId: { type: "string", format: "uuid" },
+          paymentMethod: { type: "string", example: "COD", description: "Payment provider. Defaults to COD." },
+        },
+      },
+      UpdateOrderStatusRequest: {
+        type: "object",
+        required: ["status"],
+        properties: {
+          status: { type: "string", enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] },
+        },
+      },
+      UpdatePaymentStatusRequest: {
+        type: "object",
+        required: ["status"],
+        properties: {
+          status: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+        },
+      },
+      Payment: {
+        type: "object",
+        properties: {
+          id: { type: "string", format: "uuid" },
+          orderId: { type: "string", format: "uuid" },
+          amount: { type: "number", example: 999.98 },
+          provider: { type: "string", example: "COD" },
+          method: { type: "string", nullable: true },
+          status: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+          transactionId: { type: "string", nullable: true },
+          paymentIntentId: { type: "string", nullable: true },
+          rawResponse: { type: "object", nullable: true },
+          paidAt: { type: "string", format: "date-time", nullable: true },
+          createdAt: { type: "string", format: "date-time" },
+          updatedAt: { type: "string", format: "date-time" },
+          order: {
+            type: "object",
+            properties: {
+              id: { type: "string", format: "uuid" },
+              orderNumber: { type: "string", example: "ORD-M1A2B3-X4Y5" },
+              totalAmount: { type: "number", example: 999.98 },
+              orderStatus: { type: "string" },
+              paymentStatus: { type: "string" },
+            },
+          },
+        },
+      },
+      AdminPayment: {
+        type: "object",
+        description: "Payment with user info (admin view)",
+        allOf: [
+          { $ref: "#/components/schemas/Payment" },
+          {
+            type: "object",
+            properties: {
+              order: {
+                type: "object",
+                properties: {
+                  id: { type: "string", format: "uuid" },
+                  orderNumber: { type: "string" },
+                  totalAmount: { type: "number" },
+                  orderStatus: { type: "string" },
+                  paymentStatus: { type: "string" },
+                  user: {
+                    type: "object",
+                    properties: {
+                      id: { type: "string", format: "uuid" },
+                      name: { type: "string" },
+                      email: { type: "string" },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        ],
+      },
     },
     responses: {
       Unauthorized: {
@@ -319,7 +540,9 @@ export const swaggerSpec = {
                     {
                       type: "object",
                       properties: {
-                        data: { $ref: "#/components/schemas/LoginResponseData" },
+                        data: {
+                          $ref: "#/components/schemas/LoginResponseData",
+                        },
                       },
                     },
                   ],
@@ -521,7 +744,10 @@ export const swaggerSpec = {
                 required: ["name", "price", "categoryId", "thumbnail"],
                 properties: {
                   name: { type: "string", example: "Smartphone" },
-                  description: { type: "string", example: "A modern smartphone" },
+                  description: {
+                    type: "string",
+                    example: "A modern smartphone",
+                  },
                   price: { type: "number", example: 499.99 },
                   stock: { type: "integer", example: 20 },
                   isFeatured: { type: "boolean", example: false },
@@ -638,15 +864,6 @@ export const swaggerSpec = {
             },
           },
           "401": { $ref: "#/components/responses/Unauthorized" },
-          "404": { $ref: "#/components/responses/NotFound" },
-          "409": {
-            description: "Product already exists in wishlist.",
-            content: {
-              "application/json": {
-                schema: { $ref: "#/components/schemas/ErrorResponse" },
-              },
-            },
-          },
         },
       },
     },
@@ -798,7 +1015,9 @@ export const swaggerSpec = {
           required: true,
           content: {
             "application/json": {
-              schema: { $ref: "#/components/schemas/UpdateCartQuantityRequest" },
+              schema: {
+                $ref: "#/components/schemas/UpdateCartQuantityRequest",
+              },
             },
           },
         },
@@ -857,6 +1076,771 @@ export const swaggerSpec = {
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ApiResponse" },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+    },
+    // ========== SHIPPING ADDRESS ==========
+    "/api/v1/shipping-address": {
+      post: {
+        tags: ["Shipping Address"],
+        summary: "Create a shipping address",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CreateShippingAddressRequest" },
+            },
+          },
+        },
+        responses: {
+          "201": {
+            description: "Shipping address created successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/ShippingAddress" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Validation error.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+        },
+      },
+      get: {
+        tags: ["Shipping Address"],
+        summary: "Get my shipping addresses",
+        security: [{ bearerAuth: [] }],
+        responses: {
+          "200": {
+            description: "Shipping addresses retrieved successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          type: "array",
+                          items: { $ref: "#/components/schemas/ShippingAddress" },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+        },
+      },
+    },
+    "/api/v1/shipping-address/{id}": {
+      get: {
+        tags: ["Shipping Address"],
+        summary: "Get a shipping address by ID",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Shipping address retrieved successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/ShippingAddress" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+      patch: {
+        tags: ["Shipping Address"],
+        summary: "Update a shipping address",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/UpdateShippingAddressRequest" },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Shipping address updated successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/ShippingAddress" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+      delete: {
+        tags: ["Shipping Address"],
+        summary: "Delete a shipping address",
+        description: "Deletes a shipping address. Will fail if the address is linked to active orders (PENDING, PROCESSING, or SHIPPED).",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Shipping address deleted successfully.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ApiResponse" },
+              },
+            },
+          },
+          "400": {
+            description: "Cannot delete — address is linked to active orders.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+    },
+    // ========== ORDER ==========
+    "/api/v1/order/checkout": {
+      post: {
+        tags: ["Order"],
+        summary: "Checkout — create order from cart",
+        description: "Creates an order from the user's cart. Validates shipping address, stock availability, calculates totals, creates order + items, decrements stock, creates payment record (COD by default), and clears the cart. All operations run in a transaction.",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/CheckoutRequest" },
+            },
+          },
+        },
+        responses: {
+          "201": {
+            description: "Order placed successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/Order" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Cart is empty, insufficient stock, or missing shippingAddressId.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+    },
+    "/api/v1/order/my-orders": {
+      get: {
+        tags: ["Order"],
+        summary: "Get my orders (paginated)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            schema: { type: "integer", default: 1 },
+            description: "Page number",
+          },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", default: 10 },
+            description: "Items per page",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Orders retrieved successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          type: "array",
+                          items: { $ref: "#/components/schemas/Order" },
+                        },
+                        meta: { $ref: "#/components/schemas/PaginationMeta" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+        },
+      },
+    },
+    "/api/v1/order/my-orders/{id}": {
+      get: {
+        tags: ["Order"],
+        summary: "Get a single order by ID",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Order retrieved successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/Order" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+    },
+    "/api/v1/order/my-orders/{id}/cancel": {
+      patch: {
+        tags: ["Order"],
+        summary: "Cancel a pending order",
+        description: "Cancels an order. Only orders with status PENDING can be cancelled. Stock is restored for all items.",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Order cancelled successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/Order" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Only PENDING orders can be cancelled.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+    },
+    "/api/v1/order/admin/all": {
+      get: {
+        tags: ["Order"],
+        summary: "[Admin] Get all orders (paginated + filtered)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            schema: { type: "integer", default: 1 },
+          },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", default: 10 },
+          },
+          {
+            name: "orderStatus",
+            in: "query",
+            schema: { type: "string", enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] },
+            description: "Filter by order status",
+          },
+          {
+            name: "paymentStatus",
+            in: "query",
+            schema: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+            description: "Filter by payment status",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "All orders retrieved successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          type: "array",
+                          items: { $ref: "#/components/schemas/AdminOrder" },
+                        },
+                        meta: { $ref: "#/components/schemas/PaginationMeta" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+        },
+      },
+    },
+    "/api/v1/order/admin/{id}/status": {
+      patch: {
+        tags: ["Order"],
+        summary: "[Admin] Update order status",
+        description: "Updates the order status. Cannot update CANCELLED or DELIVERED orders. If setting to CANCELLED, stock is automatically restored.",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/UpdateOrderStatusRequest" },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Order status updated successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/Order" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Invalid status or cannot update.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+    },
+    "/api/v1/order/admin/{id}/payment-status": {
+      patch: {
+        tags: ["Order"],
+        summary: "[Admin] Update payment status",
+        description: "Updates the payment status for an order. When setting to PAID, the paidAt timestamp is automatically set.",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: { $ref: "#/components/schemas/UpdatePaymentStatusRequest" },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description: "Payment status updated successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/Order" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Invalid payment status.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+    },
+    // ========== PAYMENT ==========
+    "/api/v1/payment/order/{orderId}": {
+      get: {
+        tags: ["Payment"],
+        summary: "Get payments for a specific order",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "orderId",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Payments retrieved successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          type: "array",
+                          items: { $ref: "#/components/schemas/Payment" },
+                        },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+    },
+    "/api/v1/payment/my-payments": {
+      get: {
+        tags: ["Payment"],
+        summary: "Get all my payments (paginated)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            schema: { type: "integer", default: 1 },
+          },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", default: 10 },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Payments retrieved successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          type: "array",
+                          items: { $ref: "#/components/schemas/Payment" },
+                        },
+                        meta: { $ref: "#/components/schemas/PaginationMeta" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+        },
+      },
+    },
+    "/api/v1/payment/cod/{orderId}/confirm": {
+      patch: {
+        tags: ["Payment"],
+        summary: "Confirm COD payment",
+        description: "Confirms Cash on Delivery payment for a delivered order. Only works when order status is DELIVERED and payment is not already PAID.",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "orderId",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "COD payment confirmed successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/PaymentSummary" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "400": {
+            description: "Order not delivered yet, already paid, or no COD payment found.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/ErrorResponse" },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+          "404": { $ref: "#/components/responses/NotFound" },
+        },
+      },
+    },
+    "/api/v1/payment/admin/all": {
+      get: {
+        tags: ["Payment"],
+        summary: "[Admin] Get all payments (paginated + filtered)",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "page",
+            in: "query",
+            schema: { type: "integer", default: 1 },
+          },
+          {
+            name: "limit",
+            in: "query",
+            schema: { type: "integer", default: 10 },
+          },
+          {
+            name: "status",
+            in: "query",
+            schema: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+            description: "Filter by payment status",
+          },
+          {
+            name: "provider",
+            in: "query",
+            schema: { type: "string" },
+            description: "Filter by provider (e.g. COD, STRIPE, SSLCOMMERZ)",
+          },
+        ],
+        responses: {
+          "200": {
+            description: "All payments retrieved successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: {
+                          type: "array",
+                          items: { $ref: "#/components/schemas/AdminPayment" },
+                        },
+                        meta: { $ref: "#/components/schemas/PaginationMeta" },
+                      },
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          "401": { $ref: "#/components/responses/Unauthorized" },
+          "403": { $ref: "#/components/responses/Forbidden" },
+        },
+      },
+    },
+    "/api/v1/payment/admin/{id}": {
+      get: {
+        tags: ["Payment"],
+        summary: "[Admin] Get a single payment by ID",
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "string", format: "uuid" },
+          },
+        ],
+        responses: {
+          "200": {
+            description: "Payment retrieved successfully.",
+            content: {
+              "application/json": {
+                schema: {
+                  allOf: [
+                    { $ref: "#/components/schemas/ApiResponse" },
+                    {
+                      type: "object",
+                      properties: {
+                        data: { $ref: "#/components/schemas/AdminPayment" },
+                      },
+                    },
+                  ],
+                },
               },
             },
           },
