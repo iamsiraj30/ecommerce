@@ -251,7 +251,14 @@ export const swaggerSpec = {
       },
       CreateShippingAddressRequest: {
         type: "object",
-        required: ["fullName", "phone", "addressLine1", "city", "country", "postalCode"],
+        required: [
+          "fullName",
+          "phone",
+          "addressLine1",
+          "city",
+          "country",
+          "postalCode",
+        ],
         properties: {
           fullName: { type: "string", example: "John Doe" },
           phone: { type: "string", example: "+8801700000000" },
@@ -305,7 +312,10 @@ export const swaggerSpec = {
           amount: { type: "number", example: 999.98 },
           provider: { type: "string", example: "COD" },
           method: { type: "string", nullable: true, example: null },
-          status: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+          status: {
+            type: "string",
+            enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+          },
           transactionId: { type: "string", nullable: true },
           paidAt: { type: "string", format: "date-time", nullable: true },
           createdAt: { type: "string", format: "date-time" },
@@ -321,8 +331,20 @@ export const swaggerSpec = {
           subtotal: { type: "number", example: 999.98 },
           discountAmount: { type: "number", example: 0 },
           totalAmount: { type: "number", example: 999.98 },
-          paymentStatus: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
-          orderStatus: { type: "string", enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] },
+          paymentStatus: {
+            type: "string",
+            enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+          },
+          orderStatus: {
+            type: "string",
+            enum: [
+              "PENDING",
+              "PROCESSING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+            ],
+          },
           items: {
             type: "array",
             items: { $ref: "#/components/schemas/OrderItem" },
@@ -362,21 +384,37 @@ export const swaggerSpec = {
         required: ["shippingAddressId"],
         properties: {
           shippingAddressId: { type: "string", format: "uuid" },
-          paymentMethod: { type: "string", example: "COD", description: "Payment provider. Defaults to COD." },
+          paymentMethod: {
+            type: "string",
+            example: "COD",
+            description: "Payment provider. Defaults to COD.",
+          },
         },
       },
       UpdateOrderStatusRequest: {
         type: "object",
         required: ["status"],
         properties: {
-          status: { type: "string", enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] },
+          status: {
+            type: "string",
+            enum: [
+              "PENDING",
+              "PROCESSING",
+              "SHIPPED",
+              "DELIVERED",
+              "CANCELLED",
+            ],
+          },
         },
       },
       UpdatePaymentStatusRequest: {
         type: "object",
         required: ["status"],
         properties: {
-          status: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+          status: {
+            type: "string",
+            enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+          },
         },
       },
       Payment: {
@@ -387,7 +425,10 @@ export const swaggerSpec = {
           amount: { type: "number", example: 999.98 },
           provider: { type: "string", example: "COD" },
           method: { type: "string", nullable: true },
-          status: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+          status: {
+            type: "string",
+            enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+          },
           transactionId: { type: "string", nullable: true },
           paymentIntentId: { type: "string", nullable: true },
           rawResponse: { type: "object", nullable: true },
@@ -512,8 +553,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "400": { $ref: "#/components/responses/Unauthorized" },
-          "401": { $ref: "#/components/responses/Unauthorized" },
         },
       },
     },
@@ -671,9 +710,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
       delete: {
@@ -697,9 +733,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -781,9 +814,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -922,8 +952,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -993,8 +1021,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -1053,9 +1079,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
       delete: {
@@ -1079,9 +1102,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -1095,7 +1115,9 @@ export const swaggerSpec = {
           required: true,
           content: {
             "application/json": {
-              schema: { $ref: "#/components/schemas/CreateShippingAddressRequest" },
+              schema: {
+                $ref: "#/components/schemas/CreateShippingAddressRequest",
+              },
             },
           },
         },
@@ -1146,7 +1168,9 @@ export const swaggerSpec = {
                       properties: {
                         data: {
                           type: "array",
-                          items: { $ref: "#/components/schemas/ShippingAddress" },
+                          items: {
+                            $ref: "#/components/schemas/ShippingAddress",
+                          },
                         },
                       },
                     },
@@ -1191,9 +1215,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
       patch: {
@@ -1212,7 +1233,9 @@ export const swaggerSpec = {
           required: true,
           content: {
             "application/json": {
-              schema: { $ref: "#/components/schemas/UpdateShippingAddressRequest" },
+              schema: {
+                $ref: "#/components/schemas/UpdateShippingAddressRequest",
+              },
             },
           },
         },
@@ -1235,15 +1258,13 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
       delete: {
         tags: ["Shipping Address"],
         summary: "Delete a shipping address",
-        description: "Deletes a shipping address. Will fail if the address is linked to active orders (PENDING, PROCESSING, or SHIPPED).",
+        description:
+          "Deletes a shipping address. Will fail if the address is linked to active orders (PENDING, PROCESSING, or SHIPPED).",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -1270,9 +1291,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -1281,7 +1299,8 @@ export const swaggerSpec = {
       post: {
         tags: ["Order"],
         summary: "Checkout — create order from cart",
-        description: "Creates an order from the user's cart. Validates shipping address, stock availability, calculates totals, creates order + items, decrements stock, creates payment record (COD by default), and clears the cart. All operations run in a transaction.",
+        description:
+          "Creates an order from the user's cart. Validates shipping address, stock availability, calculates totals, creates order + items, decrements stock, creates payment record (COD by default), and clears the cart. All operations run in a transaction.",
         security: [{ bearerAuth: [] }],
         requestBody: {
           required: true,
@@ -1311,16 +1330,14 @@ export const swaggerSpec = {
             },
           },
           "400": {
-            description: "Cart is empty, insufficient stock, or missing shippingAddressId.",
+            description:
+              "Cart is empty, insufficient stock, or missing shippingAddressId.",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ErrorResponse" },
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -1402,9 +1419,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -1412,7 +1426,8 @@ export const swaggerSpec = {
       patch: {
         tags: ["Order"],
         summary: "Cancel a pending order",
-        description: "Cancels an order. Only orders with status PENDING can be cancelled. Stock is restored for all items.",
+        description:
+          "Cancels an order. Only orders with status PENDING can be cancelled. Stock is restored for all items.",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -1449,9 +1464,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -1474,13 +1486,25 @@ export const swaggerSpec = {
           {
             name: "orderStatus",
             in: "query",
-            schema: { type: "string", enum: ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] },
+            schema: {
+              type: "string",
+              enum: [
+                "PENDING",
+                "PROCESSING",
+                "SHIPPED",
+                "DELIVERED",
+                "CANCELLED",
+              ],
+            },
             description: "Filter by order status",
           },
           {
             name: "paymentStatus",
             in: "query",
-            schema: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+            schema: {
+              type: "string",
+              enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+            },
             description: "Filter by payment status",
           },
         ],
@@ -1507,8 +1531,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
         },
       },
     },
@@ -1516,7 +1538,8 @@ export const swaggerSpec = {
       patch: {
         tags: ["Order"],
         summary: "[Admin] Update order status",
-        description: "Updates the order status. Cannot update CANCELLED or DELIVERED orders. If setting to CANCELLED, stock is automatically restored.",
+        description:
+          "Updates the order status. Cannot update CANCELLED or DELIVERED orders. If setting to CANCELLED, stock is automatically restored.",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -1561,9 +1584,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -1571,7 +1591,8 @@ export const swaggerSpec = {
       patch: {
         tags: ["Order"],
         summary: "[Admin] Update payment status",
-        description: "Updates the payment status for an order. When setting to PAID, the paidAt timestamp is automatically set.",
+        description:
+          "Updates the payment status for an order. When setting to PAID, the paidAt timestamp is automatically set.",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -1585,7 +1606,9 @@ export const swaggerSpec = {
           required: true,
           content: {
             "application/json": {
-              schema: { $ref: "#/components/schemas/UpdatePaymentStatusRequest" },
+              schema: {
+                $ref: "#/components/schemas/UpdatePaymentStatusRequest",
+              },
             },
           },
         },
@@ -1658,9 +1681,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -1712,7 +1732,8 @@ export const swaggerSpec = {
       patch: {
         tags: ["Payment"],
         summary: "Confirm COD payment",
-        description: "Confirms Cash on Delivery payment for a delivered order. Only works when order status is DELIVERED and payment is not already PAID.",
+        description:
+          "Confirms Cash on Delivery payment for a delivered order. Only works when order status is DELIVERED and payment is not already PAID.",
         security: [{ bearerAuth: [] }],
         parameters: [
           {
@@ -1742,16 +1763,14 @@ export const swaggerSpec = {
             },
           },
           "400": {
-            description: "Order not delivered yet, already paid, or no COD payment found.",
+            description:
+              "Order not delivered yet, already paid, or no COD payment found.",
             content: {
               "application/json": {
                 schema: { $ref: "#/components/schemas/ErrorResponse" },
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },
@@ -1774,7 +1793,10 @@ export const swaggerSpec = {
           {
             name: "status",
             in: "query",
-            schema: { type: "string", enum: ["PENDING", "PAID", "FAILED", "REFUNDED"] },
+            schema: {
+              type: "string",
+              enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+            },
             description: "Filter by payment status",
           },
           {
@@ -1807,8 +1829,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
         },
       },
     },
@@ -1844,9 +1864,6 @@ export const swaggerSpec = {
               },
             },
           },
-          "401": { $ref: "#/components/responses/Unauthorized" },
-          "403": { $ref: "#/components/responses/Forbidden" },
-          "404": { $ref: "#/components/responses/NotFound" },
         },
       },
     },

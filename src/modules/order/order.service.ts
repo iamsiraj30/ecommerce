@@ -1,16 +1,12 @@
 import AppError from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
 
-// ========== HELPERS ==========
-
-// Generate unique order number
 const generateOrderNumber = (): string => {
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   return `ORD-${timestamp}-${random}`;
 };
 
-// Common order include for consistent response shape
 const orderInclude = {
   items: {
     include: {
@@ -39,9 +35,7 @@ const orderInclude = {
   },
 };
 
-// ========== USER OPERATIONS ==========
-
-// Checkout: Create order from cart (transactional)
+// Checkout: Create order from cart
 const checkoutFromCart = async (
   userId: string,
   payload: {
@@ -55,9 +49,7 @@ const checkoutFromCart = async (
     throw new AppError(400, "Shipping address ID is required");
   }
 
-  // Run everything inside a transaction for atomicity
   const order = await prisma.$transaction(async (tx) => {
-    // 1. Validate shipping address exists & belongs to user
     const shippingAddress = await tx.shippingAddress.findUnique({
       where: { id: shippingAddressId },
     });
@@ -70,7 +62,6 @@ const checkoutFromCart = async (
       throw new AppError(403, "This shipping address does not belong to you");
     }
 
-    // 2. Fetch user's cart with items + product data
     const cart = await tx.cart.findUnique({
       where: { userId },
       include: {
@@ -82,12 +73,10 @@ const checkoutFromCart = async (
       },
     });
 
-    // 3. Validate cart is not empty
     if (!cart || cart.items.length === 0) {
       throw new AppError(400, "Your cart is empty");
     }
 
-    // 4. Validate stock for each item
     for (const item of cart.items) {
       if (item.product.stock < item.quantity) {
         throw new AppError(
@@ -97,7 +86,6 @@ const checkoutFromCart = async (
       }
     }
 
-    // 5. Calculate subtotal & totalAmount
     const subtotal = cart.items.reduce((acc, item) => {
       return acc + item.quantity * item.product.price;
     }, 0);
@@ -105,10 +93,8 @@ const checkoutFromCart = async (
     const discountAmount = 0;
     const totalAmount = subtotal - discountAmount;
 
-    // 6. Generate unique order number
     const orderNumber = generateOrderNumber();
 
-    // 7. Create Order record
     const newOrder = await tx.order.create({
       data: {
         orderNumber,
@@ -122,7 +108,6 @@ const checkoutFromCart = async (
       },
     });
 
-    // 8. Create OrderItem records (snapshot unitPrice & totalPrice)
     await tx.orderItem.createMany({
       data: cart.items.map((item) => ({
         orderId: newOrder.id,
@@ -133,7 +118,6 @@ const checkoutFromCart = async (
       })),
     });
 
-    // 9. Decrement product stock for each item
     for (const item of cart.items) {
       await tx.product.update({
         where: { id: item.productId },
@@ -145,7 +129,6 @@ const checkoutFromCart = async (
       });
     }
 
-    // 10. Create Payment record
     await tx.payment.create({
       data: {
         orderId: newOrder.id,
@@ -155,12 +138,10 @@ const checkoutFromCart = async (
       },
     });
 
-    // 11. Clear the user's cart items
     await tx.cartItem.deleteMany({
       where: { cartId: cart.id },
     });
 
-    // 12. Return the complete order with all relations
     const completeOrder = await tx.order.findUnique({
       where: { id: newOrder.id },
       include: orderInclude,
@@ -172,7 +153,6 @@ const checkoutFromCart = async (
   return order;
 };
 
-// Get all orders for a user (paginated)
 const getMyOrdersFromDB = async (userId: string, page = 1, limit = 10) => {
   const skip = (page - 1) * limit;
 
@@ -200,7 +180,6 @@ const getMyOrdersFromDB = async (userId: string, page = 1, limit = 10) => {
   };
 };
 
-// Get single order by ID (with ownership check)
 const getOrderByIdFromDB = async (orderId: string, userId: string) => {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -218,7 +197,6 @@ const getOrderByIdFromDB = async (orderId: string, userId: string) => {
   return order;
 };
 
-// Cancel order (only PENDING orders, restore stock)
 const cancelOrderIntoDB = async (orderId: string, userId: string) => {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -256,7 +234,6 @@ const cancelOrderIntoDB = async (orderId: string, userId: string) => {
       });
     }
 
-    // Update order status to CANCELLED
     const updated = await tx.order.update({
       where: { id: orderId },
       data: {
@@ -266,7 +243,6 @@ const cancelOrderIntoDB = async (orderId: string, userId: string) => {
       include: orderInclude,
     });
 
-    // Update payment status to REFUNDED
     await tx.payment.updateMany({
       where: { orderId },
       data: {
@@ -280,9 +256,6 @@ const cancelOrderIntoDB = async (orderId: string, userId: string) => {
   return cancelledOrder;
 };
 
-// ========== ADMIN OPERATIONS ==========
-
-// Get all orders (admin, paginated with filters)
 const getAllOrdersFromDB = async (
   page = 1,
   limit = 10,
@@ -336,7 +309,6 @@ const getAllOrdersFromDB = async (
   };
 };
 
-// Update order status (admin) with state transition validation
 const updateOrderStatusIntoDB = async (orderId: string, status: string) => {
   const validStatuses = [
     "PENDING",
@@ -370,7 +342,6 @@ const updateOrderStatusIntoDB = async (orderId: string, status: string) => {
     throw new AppError(400, "Cannot update a delivered order");
   }
 
-  // If admin is cancelling, restore stock
   if (status === "CANCELLED") {
     const cancelledOrder = await prisma.$transaction(async (tx) => {
       // Restore stock
@@ -405,7 +376,6 @@ const updateOrderStatusIntoDB = async (orderId: string, status: string) => {
     return cancelledOrder;
   }
 
-  // Normal status update
   const updated = await prisma.order.update({
     where: { id: orderId },
     data: {
@@ -417,7 +387,6 @@ const updateOrderStatusIntoDB = async (orderId: string, status: string) => {
   return updated;
 };
 
-// Update payment status (admin)
 const updatePaymentStatusIntoDB = async (orderId: string, status: string) => {
   const validStatuses = ["PENDING", "PAID", "FAILED", "REFUNDED"];
 
@@ -445,7 +414,6 @@ const updatePaymentStatusIntoDB = async (orderId: string, status: string) => {
     },
   });
 
-  // Update all payment records for this order
   await prisma.payment.updateMany({
     where: { orderId },
     data: {
@@ -454,7 +422,6 @@ const updatePaymentStatusIntoDB = async (orderId: string, status: string) => {
     },
   });
 
-  // Return updated order with relations
   const completeOrder = await prisma.order.findUnique({
     where: { id: orderId },
     include: orderInclude,

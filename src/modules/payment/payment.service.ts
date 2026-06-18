@@ -1,7 +1,6 @@
 import AppError from "../../errors/AppError";
 import { prisma } from "../../lib/prisma";
 
-// Get payments for a specific order (user ownership check)
 const getPaymentsByOrderId = async (orderId: string, userId: string) => {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -33,15 +32,9 @@ const getPaymentsByOrderId = async (orderId: string, userId: string) => {
   return payments;
 };
 
-// Get all payments for a user (via their orders, paginated)
-const getMyPaymentsFromDB = async (
-  userId: string,
-  page = 1,
-  limit = 10,
-) => {
+const getMyPaymentsFromDB = async (userId: string, page = 1, limit = 10) => {
   const skip = (page - 1) * limit;
 
-  // Get all order IDs belonging to user
   const userOrders = await prisma.order.findMany({
     where: { userId },
     select: { id: true },
@@ -92,7 +85,6 @@ const getMyPaymentsFromDB = async (
   };
 };
 
-// Confirm COD payment (user confirms receipt, marks as PAID)
 const confirmCodPayment = async (orderId: string, userId: string) => {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -108,26 +100,20 @@ const confirmCodPayment = async (orderId: string, userId: string) => {
   }
 
   if (order.orderStatus !== "DELIVERED") {
-    throw new AppError(
-      400,
-      "COD payment can only be confirmed after delivery",
-    );
+    throw new AppError(400, "COD payment can only be confirmed after delivery");
   }
 
   if (order.paymentStatus === "PAID") {
     throw new AppError(400, "This order has already been paid");
   }
 
-  // Find the COD payment record
   const codPayment = order.payments.find((p) => p.provider === "COD");
 
   if (!codPayment) {
     throw new AppError(400, "No COD payment found for this order");
   }
 
-  // Update payment and order in a transaction
   const result = await prisma.$transaction(async (tx) => {
-    // Update payment record
     const updatedPayment = await tx.payment.update({
       where: { id: codPayment.id },
       data: {
@@ -136,7 +122,6 @@ const confirmCodPayment = async (orderId: string, userId: string) => {
       },
     });
 
-    // Update order payment status
     await tx.order.update({
       where: { id: orderId },
       data: {
@@ -150,9 +135,6 @@ const confirmCodPayment = async (orderId: string, userId: string) => {
   return result;
 };
 
-// ========== ADMIN OPERATIONS ==========
-
-// Get all payments (admin, paginated with filters)
 const getAllPaymentsFromDB = async (
   page = 1,
   limit = 10,
@@ -213,7 +195,6 @@ const getAllPaymentsFromDB = async (
   };
 };
 
-// Get single payment by ID (admin)
 const getPaymentByIdFromDB = async (paymentId: string) => {
   const payment = await prisma.payment.findUnique({
     where: { id: paymentId },
