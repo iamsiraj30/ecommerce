@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { UserRole } from "../generated/prisma/enums";
+import { UserRole } from "@prisma/client";
 
 type DecodedToken = {
   userId: string;
