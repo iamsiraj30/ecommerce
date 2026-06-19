@@ -3,3 +3,12 @@ node_modules
  
 
 /generated/prisma
+
+
+
+
+
+
+
+.env.development
+.env.example
