@@ -9,6 +9,10 @@ export const swaggerSpec = {
   },
   servers: [
     {
+      url: "https://ecommerce-j3dr.onrender.com/",
+      description: "Render live server",
+    },
+    {
       url: "http://localhost:8080",
       description: "Local development server",
     },
