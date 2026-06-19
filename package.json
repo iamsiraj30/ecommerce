@@ -2,9 +2,9 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.ts",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node dis/server.js",
+    "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
     "prisma:generate": "prisma generate",
